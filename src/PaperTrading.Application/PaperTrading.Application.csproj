@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PaperTrading.Domain\PaperTrading.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

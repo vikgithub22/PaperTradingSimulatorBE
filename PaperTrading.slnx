@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PaperTrading.API/PaperTrading.API.csproj" />
+  </Folder>
+  <Project Path="src/PaperTrading.Application/PaperTrading.Application.csproj" Id="ea1647a9-4311-45d4-9df7-976b396995c3" />
+  <Project Path="src/PaperTrading.Domain/PaperTrading.Domain.csproj" Id="363d7044-da67-4de8-a374-b30b7b74b353" />
+  <Project Path="src/PaperTrading.Infrastructure/PaperTrading.Infrastructure.csproj" Id="88b3f56b-1815-463e-94a9-25a497e22db8" />
+  <Project Path="tests/PaperTrading.Tests/PaperTrading.Tests.csproj" Id="f90c9261-bf71-404d-8760-f4f5c177eb9e" />
+</Solution>

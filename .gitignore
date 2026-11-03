@@ -1,0 +1,24 @@
+## .NET / Visual Studio
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+[Dd]ebug/
+[Rr]elease/
+TestResults/
+*.log
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+## Secrets / local config
+appsettings.Local.json
+*.pfx
+
+## Angular / Node
+node_modules/
+dist/
+.angular/

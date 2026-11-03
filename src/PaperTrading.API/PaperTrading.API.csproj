@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PaperTrading.Application\PaperTrading.Application.csproj" />
+    <ProjectReference Include="..\PaperTrading.Infrastructure\PaperTrading.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

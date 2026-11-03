@@ -1,0 +1,6 @@
+@PaperTrading_API_HostAddress = http://localhost:5103
+
+GET {{PaperTrading_API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
