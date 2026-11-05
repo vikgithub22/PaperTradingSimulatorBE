@@ -1,4 +1,5 @@
 using PaperTrading.API.Middleware;
+using PaperTrading.Application;
 using PaperTrading.Infrastructure;
 using Serilog;
 using Serilog.Context;
@@ -18,6 +19,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 builder.Services.AddControllers();
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddOpenApi();
