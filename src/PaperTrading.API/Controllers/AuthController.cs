@@ -116,7 +116,9 @@ public sealed class AuthController(IMediator mediator, IHostEnvironment environm
     private static AuthResponse ToResponse(AuthSessionDto session)
         => new(session.AccessToken, session.ExpiresAtUtc, session.User);
 
-    private bool SecureCookie => !environment.IsEnvironment("Testing");
+    // Development stays non-Secure so the HTTP Angular dev server can store the cookie.
+    // Production marks it Secure.
+    private bool SecureCookie => environment.IsProduction();
 
     private string? ClientIp() => HttpContext.Connection.RemoteIpAddress?.ToString();
 
