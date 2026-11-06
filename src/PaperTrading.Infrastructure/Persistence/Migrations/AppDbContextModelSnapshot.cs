@@ -187,9 +187,19 @@ namespace PaperTrading.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WalletId");
+                    b.HasIndex("WalletId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_LedgerEntries_OneInitialDeposit")
+                        .HasFilter("[Reason] = 1");
 
-                    b.ToTable("LedgerEntries", (string)null);
+                    b.HasIndex("WalletId", "CreatedAtUtc", "Id")
+                        .IsDescending(false, true, true)
+                        .HasDatabaseName("IX_LedgerEntries_WalletId_CreatedAtUtc_Id");
+
+                    b.ToTable("LedgerEntries", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_LedgerEntries_Amount_Positive", "[Amount] > 0");
+                        });
                 });
 
             modelBuilder.Entity("PaperTrading.Domain.Entities.Wallet", b =>
@@ -217,7 +227,10 @@ namespace PaperTrading.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Wallets", (string)null);
+                    b.ToTable("Wallets", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Wallets_Balance_NonNegative", "[Balance] >= 0");
+                        });
                 });
 
             modelBuilder.Entity("PaperTrading.Infrastructure.Identity.ApplicationUser", b =>
@@ -294,6 +307,59 @@ namespace PaperTrading.Infrastructure.Persistence.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("PaperTrading.Infrastructure.Identity.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedByIp")
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<DateTimeOffset>("ExpiresAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ReplacedByTokenId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("RevokedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("RevokedReason")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<byte[]>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(32)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FamilyId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -350,6 +416,24 @@ namespace PaperTrading.Infrastructure.Persistence.Migrations
                     b.HasOne("PaperTrading.Domain.Entities.Wallet", null)
                         .WithMany("LedgerEntries")
                         .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PaperTrading.Domain.Entities.Wallet", b =>
+                {
+                    b.HasOne("PaperTrading.Infrastructure.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PaperTrading.Infrastructure.Identity.RefreshToken", b =>
+                {
+                    b.HasOne("PaperTrading.Infrastructure.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

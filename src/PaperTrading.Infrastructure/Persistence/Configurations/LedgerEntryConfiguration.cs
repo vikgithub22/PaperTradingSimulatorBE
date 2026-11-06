@@ -8,7 +8,10 @@ internal sealed class LedgerEntryConfiguration : IEntityTypeConfiguration<Ledger
 {
     public void Configure(EntityTypeBuilder<LedgerEntry> builder)
     {
-        builder.ToTable("LedgerEntries");
+        builder.ToTable("LedgerEntries", table =>
+        {
+            table.HasCheckConstraint("CK_LedgerEntries_Amount_Positive", "[Amount] > 0");
+        });
 
         builder.HasKey(e => e.Id);
 
@@ -42,6 +45,14 @@ internal sealed class LedgerEntryConfiguration : IEntityTypeConfiguration<Ledger
         builder.Property(e => e.CreatedAtUtc)
             .IsRequired();
 
-        builder.HasIndex(e => e.WalletId);
+        // Reason value 1 is LedgerEntryReason.InitialDeposit. One starting balance per wallet.
+        builder.HasIndex(e => e.WalletId)
+            .IsUnique()
+            .HasFilter("[Reason] = 1")
+            .HasDatabaseName("IX_LedgerEntries_OneInitialDeposit");
+
+        builder.HasIndex(e => new { e.WalletId, e.CreatedAtUtc, e.Id })
+            .IsDescending(false, true, true)
+            .HasDatabaseName("IX_LedgerEntries_WalletId_CreatedAtUtc_Id");
     }
 }

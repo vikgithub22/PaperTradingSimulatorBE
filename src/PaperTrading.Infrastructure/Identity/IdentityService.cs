@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PaperTrading.Application.Common.Interfaces;
 using PaperTrading.Application.Common.Models;
 
@@ -38,9 +39,28 @@ public sealed class IdentityService : IIdentityService
             CreatedAtUtc = _timeProvider.GetUtcNow()
         };
 
-        var result = await _userManager.CreateAsync(user, password);
+        IdentityResult result;
+        try
+        {
+            result = await _userManager.CreateAsync(user, password);
+        }
+        catch (DbUpdateException ex) when (IsUniqueViolation(ex))
+        {
+            return Result.Failure<Guid>(Error.Conflict(
+                "User.DuplicateEmail",
+                "A user with this email already exists."));
+        }
+
         if (!result.Succeeded)
         {
+            if (result.Errors.Any(e =>
+                    e.Code is "DuplicateEmail" or "DuplicateUserName"))
+            {
+                return Result.Failure<Guid>(Error.Conflict(
+                    "User.DuplicateEmail",
+                    "A user with this email already exists."));
+            }
+
             var errors = result.Errors
                 .GroupBy(e => e.Code, e => e.Description)
                 .ToDictionary(g => g.Key, g => g.ToArray());
@@ -49,6 +69,13 @@ public sealed class IdentityService : IIdentityService
         }
 
         return Result.Success(user.Id);
+    }
+
+    private static bool IsUniqueViolation(DbUpdateException exception)
+    {
+        var message = exception.InnerException?.Message ?? exception.Message;
+        return message.Contains("duplicate", StringComparison.OrdinalIgnoreCase)
+            || message.Contains("unique", StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<Result<(Guid UserId, string Email, string DisplayName)>> ValidateUserCredentialsAsync(

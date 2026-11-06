@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PaperTrading.Domain.Entities;
+using PaperTrading.Infrastructure.Identity;
 
 namespace PaperTrading.Infrastructure.Persistence.Configurations;
 
@@ -8,7 +9,10 @@ internal sealed class WalletConfiguration : IEntityTypeConfiguration<Wallet>
 {
     public void Configure(EntityTypeBuilder<Wallet> builder)
     {
-        builder.ToTable("Wallets");
+        builder.ToTable("Wallets", table =>
+        {
+            table.HasCheckConstraint("CK_Wallets_Balance_NonNegative", "[Balance] >= 0");
+        });
 
         builder.HasKey(w => w.Id);
 
@@ -36,5 +40,10 @@ internal sealed class WalletConfiguration : IEntityTypeConfiguration<Wallet>
 
         builder.HasIndex(w => w.UserId)
             .IsUnique();
+
+        builder.HasOne<ApplicationUser>()
+            .WithMany()
+            .HasForeignKey(w => w.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

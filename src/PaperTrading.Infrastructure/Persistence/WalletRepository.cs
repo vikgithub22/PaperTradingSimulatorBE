@@ -8,12 +8,12 @@ internal sealed class WalletRepository(AppDbContext dbContext) : IWalletReposito
 {
     public async Task<Wallet?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         => await dbContext.Wallets
-            .Include(w => w.LedgerEntries)
+            .AsNoTracking()
             .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
 
     public async Task<Wallet?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         => await dbContext.Wallets
-            .Include(w => w.LedgerEntries)
+            .AsNoTracking()
             .FirstOrDefaultAsync(w => w.UserId == userId, cancellationToken);
 
     public async Task AddAsync(Wallet wallet, CancellationToken cancellationToken = default)
@@ -26,8 +26,10 @@ internal sealed class WalletRepository(AppDbContext dbContext) : IWalletReposito
         CancellationToken cancellationToken = default)
     {
         var query = dbContext.LedgerEntries
+            .AsNoTracking()
             .Where(e => e.WalletId == walletId)
-            .OrderByDescending(e => e.CreatedAtUtc);
+            .OrderByDescending(e => e.CreatedAtUtc)
+            .ThenByDescending(e => e.Id);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
