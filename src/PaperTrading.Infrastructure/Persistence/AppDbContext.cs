@@ -12,6 +12,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Wallet> Wallets => Set<Wallet>();
     public DbSet<LedgerEntry> LedgerEntries => Set<LedgerEntry>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Instrument> Instruments => Set<Instrument>();
+    public DbSet<Candle> Candles => Set<Candle>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

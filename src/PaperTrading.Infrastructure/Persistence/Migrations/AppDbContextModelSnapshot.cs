@@ -153,6 +153,355 @@ namespace PaperTrading.Infrastructure.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("PaperTrading.Domain.Entities.Candle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Close")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("High")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("InstrumentId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Low")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Open")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("OpenTimeUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("Volume")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstrumentId", "OpenTimeUtc")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Candles_InstrumentId_OpenTimeUtc");
+
+                    b.ToTable("Candles", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Candles_High_Gte_Close", "[High] >= [Close]");
+
+                            t.HasCheckConstraint("CK_Candles_High_Gte_Low", "[High] >= [Low]");
+
+                            t.HasCheckConstraint("CK_Candles_High_Gte_Open", "[High] >= [Open]");
+
+                            t.HasCheckConstraint("CK_Candles_Low_Lte_Close", "[Low] <= [Close]");
+
+                            t.HasCheckConstraint("CK_Candles_Low_Lte_Open", "[Low] <= [Open]");
+
+                            t.HasCheckConstraint("CK_Candles_Low_Positive", "[Low] > 0");
+
+                            t.HasCheckConstraint("CK_Candles_Volume_NonNegative", "[Volume] >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("PaperTrading.Domain.Entities.Instrument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("NSE");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<int>("LotSize")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("PreviousClose")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Sector")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("TickSize")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(4,2)")
+                        .HasDefaultValue(0.05m);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Symbol")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Instruments_Symbol");
+
+                    b.ToTable("Instruments", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Reliance Industries Ltd",
+                            PreviousClose = 2450.00m,
+                            Sector = "Energy",
+                            Symbol = "RELIANCE",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Tata Consultancy Services Ltd",
+                            PreviousClose = 3500.00m,
+                            Sector = "Technology",
+                            Symbol = "TCS",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "HDFC Bank Ltd",
+                            PreviousClose = 1650.00m,
+                            Sector = "Financial Services",
+                            Symbol = "HDFCBANK",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "ICICI Bank Ltd",
+                            PreviousClose = 1100.00m,
+                            Sector = "Financial Services",
+                            Symbol = "ICICIBANK",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Infosys Ltd",
+                            PreviousClose = 1550.00m,
+                            Sector = "Technology",
+                            Symbol = "INFY",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Bharti Airtel Ltd",
+                            PreviousClose = 1300.00m,
+                            Sector = "Telecommunication",
+                            Symbol = "BHARTIARTL",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "ITC Ltd",
+                            PreviousClose = 440.00m,
+                            Sector = "Consumer Goods",
+                            Symbol = "ITC",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "State Bank of India",
+                            PreviousClose = 750.00m,
+                            Sector = "Financial Services",
+                            Symbol = "SBIN",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Larsen & Toubro Ltd",
+                            PreviousClose = 3600.00m,
+                            Sector = "Construction",
+                            Symbol = "LT",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Hindustan Unilever Ltd",
+                            PreviousClose = 2400.00m,
+                            Sector = "Consumer Goods",
+                            Symbol = "HINDUNILVR",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Kotak Mahindra Bank Ltd",
+                            PreviousClose = 1750.00m,
+                            Sector = "Financial Services",
+                            Symbol = "KOTAKBANK",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Axis Bank Ltd",
+                            PreviousClose = 1150.00m,
+                            Sector = "Financial Services",
+                            Symbol = "AXISBANK",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Bajaj Finance Ltd",
+                            PreviousClose = 6800.00m,
+                            Sector = "Financial Services",
+                            Symbol = "BAJFINANCE",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Maruti Suzuki India Ltd",
+                            PreviousClose = 12200.00m,
+                            Sector = "Automobile",
+                            Symbol = "MARUTI",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Sun Pharmaceutical Industries Ltd",
+                            PreviousClose = 1600.00m,
+                            Sector = "Healthcare",
+                            Symbol = "SUNPHARMA",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Titan Company Ltd",
+                            PreviousClose = 3400.00m,
+                            Sector = "Consumer Durables",
+                            Symbol = "TITAN",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Asian Paints Ltd",
+                            PreviousClose = 2850.00m,
+                            Sector = "Consumer Goods",
+                            Symbol = "ASIANPAINT",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Wipro Ltd",
+                            PreviousClose = 480.00m,
+                            Sector = "Technology",
+                            Symbol = "WIPRO",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "NTPC Ltd",
+                            PreviousClose = 380.00m,
+                            Sector = "Utilities",
+                            Symbol = "NTPC",
+                            TickSize = 0.05m
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Exchange = "NSE",
+                            IsActive = true,
+                            LotSize = 1,
+                            Name = "Oil and Natural Gas Corporation Ltd",
+                            PreviousClose = 260.00m,
+                            Sector = "Energy",
+                            Symbol = "ONGC",
+                            TickSize = 0.05m
+                        });
+                });
+
             modelBuilder.Entity("PaperTrading.Domain.Entities.LedgerEntry", b =>
                 {
                     b.Property<Guid>("Id")
@@ -408,6 +757,15 @@ namespace PaperTrading.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PaperTrading.Domain.Entities.Candle", b =>
+                {
+                    b.HasOne("PaperTrading.Domain.Entities.Instrument", null)
+                        .WithMany()
+                        .HasForeignKey("InstrumentId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
